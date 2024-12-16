@@ -6,7 +6,8 @@ import { Server } from "socket.io";
 import connectDb from './utils/db.js';
 import globalErrorHandler from './middleware/errorHandler.js';
 import AppError from './utils/appError.js';
-import authRoute from './routes/authRoute.js'
+import authRoute from './routes/authRoute.js';
+import messageRoute from './routes/messageRoute.js'
 import socketController from './controller/socketController.js';
 
 const app = express()
@@ -15,9 +16,7 @@ app.use(express.json());
 
 //route handlers
 app.use("/api/v1/auth", authRoute);
-
-
-
+app.use("/api/v1/message", messageRoute);
 
 
 app.all("*", (req, _, next) => {
