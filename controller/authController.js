@@ -21,6 +21,7 @@ const register = asyncHandler(async (req, res) => {
     const tokenUser = { username: user.username, userId: user._id }
 
     res.status(201).json({
+        success: true,
         user: tokenUser
     })
 
@@ -48,6 +49,7 @@ const login = asyncHandler(async (req, res) => {
     const accessToken = generateAccessToken(tokenUser)
 
     res.status(200).json({
+        success: true,
         user: tokenUser,
         accessToken
     })
