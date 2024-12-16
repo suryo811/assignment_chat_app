@@ -9,7 +9,7 @@ const register = asyncHandler(async (req, res) => {
 
     const usernameAlreadyExists = await User.findOne({ username })
     if (usernameAlreadyExists) {
-        throw new AppError('Email already exists', 400);
+        throw new AppError('Username already exists', 400);
     }
 
     const user = await User.create({ username, password })
