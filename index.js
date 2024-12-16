@@ -3,7 +3,7 @@ import dotenv from 'dotenv'
 dotenv.config();
 import { createServer } from "http";
 import { Server } from "socket.io";
-import connectDb from './db.js';
+import connectDb from './utils/db.js';
 import globalErrorHandler from './middleware/errorHandler.js';
 import AppError from './utils/appError.js';
 import authRoute from './routes/authRoute.js'
