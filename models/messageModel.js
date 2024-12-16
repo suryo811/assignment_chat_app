@@ -5,12 +5,21 @@ const messageSchema = new mongoose.Schema({
         type: String,
     },
 
-    userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+    username: {
+        type: String,
     },
 
-}, { timestamps: true })
+    room: {
+        type: String,
+        default: 'room1'
+    },
+
+    createdAt: {
+        type: Date,
+        default: Date.now
+    }
+
+})
 
 const Message = mongoose.model('Message', messageSchema);
 export default Message;

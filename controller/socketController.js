@@ -1,125 +1,50 @@
-import authenticateSocket from '../middleware/socketAuthMiddleware.js'
+import authenticateSocket from '../middleware/socketAuthMiddleware.js';
+import Message from '../models/messageModel.js';
 
 const socketController = (io) => {
-
-    io.use(authenticateSocket);  // This will be applied to all incoming socket connections
+    // Apply authentication middleware
+    io.use(authenticateSocket);
 
     io.on('connection', (socket) => {
-        console.log(`User connected: ${socket.user.username}`);
+        // Automatically join room1
+        socket.join('room1');
+        console.log(`User connected to room1: ${socket.user.username}`);
 
-        // Event to handle sending messages
-        socket.on('send-message', (message) => {
+        // Handle sending messages
+        socket.on('send-message', async (message) => {
+            // Validate user authentication
             if (!socket.user) {
                 console.log('Unauthorized user attempted to send a message');
                 return;
             }
 
-            console.log(`Message from ${socket.user.username}: ${message}`);
-            // Broadcast the message to all connected clients
-            io.emit('new-message', { user: socket.user.username, message });
+            try {
+                // Create and save message to database
+                const newMessage = new Message({
+                    username: socket.user.username,
+                    message: message,
+                    room: 'room1'
+                });
+                await newMessage.save();
+
+                console.log(`Message saved from ${socket.user.username}: ${message}`);
+
+                // Broadcast the message to room1
+                io.to('room1').emit('new-message', {
+                    user: newMessage.username,
+                    message: newMessage.message,
+                    createdAt: newMessage.createdAt
+                });
+            } catch (error) {
+                console.error('Error saving message:', error);
+            }
         });
 
-        // Event for disconnecting
+        // Handle disconnection
         socket.on('disconnect', () => {
-            console.log(`User disconnected: ${socket.user.username}`);
+            console.log(`User disconnected from room1: ${socket.user.username}`);
         });
     });
 };
 
 export default socketController;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// // socketController.js
-// import authenticateSocket from '../middleware/socketAuthMiddleware.js'
-
-// const socketController = (io) => {
-//     // Apply the middleware to verify user on connection
-//     io.use(authenticateSocket);  // This will be applied to all incoming socket connections
-
-//     io.on('connection', (socket) => {
-//         console.log(`User connected: ${socket.user.username}`);
-
-//         // Event to handle sending messages
-//         socket.on('send-message', (room, message) => {
-//             if (!socket.user) {
-//                 console.log('Unauthorized user attempted to send a message');
-//                 return;
-//             }
-
-//             console.log(`Message from ${socket.user.username}: ${message}`);
-//             io.to(room).emit('new-message', { user: socket.user.username, message });
-//         });
-
-//         // Event to handle joining rooms
-//         socket.on('join-room', (room) => {
-//             console.log(`User ${socket.user.username} joined room: ${room}`);
-//             socket.join(room);
-//             socket.emit('message', `Welcome to room ${room}`);
-//         });
-
-//         // Event for disconnecting
-//         socket.on('disconnect', () => {
-//             console.log(`User disconnected: ${socket.user.username}`);
-//         });
-//     });
-// };
-
-// export default socketController;
-
-
-
-
-
-
-// import Message from "../models/messageModel.js"; // Import Message model
-
-// const socketController = (io) => {
-//     io.on("connection", (socket) => {
-//         console.log("A user connected");
-
-//         // Listen for 'send-message' event
-//         socket.on("send-message", async (messageData) => {
-//             try {
-//                 const { userId, message } = messageData;
-
-//                 // Store the message in the database
-//                 const newMessage = new Message({
-//                     userId,
-//                     message
-//                 });
-
-//                 await newMessage.save(); // Save the message in the DB
-//                 console.log("Message saved to database:", newMessage);
-
-//                 // Broadcast the message to all connected clients
-//                 io.emit("new-message", newMessage); // Broadcast to everyone
-
-//             } catch (error) {
-//                 console.error("Error storing message:", error);
-//             }
-//         });
-
-//         // Handle user disconnect
-//         socket.on("disconnect", () => {
-//             console.log("A user disconnected");
-//         });
-//     });
-// };
-
-// export default socketController;
