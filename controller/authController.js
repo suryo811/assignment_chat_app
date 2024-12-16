@@ -18,7 +18,7 @@ const register = asyncHandler(async (req, res) => {
 
     const user = await User.create({ username, password });
 
-    const tokenUser = { name: user.username, userId: user._id }
+    const tokenUser = { username: user.username, userId: user._id }
 
     res.status(201).json({
         user: tokenUser
@@ -43,7 +43,7 @@ const login = asyncHandler(async (req, res) => {
         throw new AppError('invalid credentials', 401)
     }
 
-    const tokenUser = { name: user.username, userId: user._id }
+    const tokenUser = { username: user.username, userId: user._id }
     //generate token
     const accessToken = generateAccessToken(tokenUser)
 
