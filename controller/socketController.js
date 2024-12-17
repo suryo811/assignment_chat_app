@@ -1,6 +1,7 @@
 import authenticateSocket from '../middleware/socketAuthMiddleware.js';
 import Message from '../models/messageModel.js';
-import applyRateLimit from '../utils/redisRateLimit.js'
+import rateLimiter from '../utils/rateLimiter.js';
+
 
 const socketController = (io) => {
     // Apply authentication middleware
@@ -16,6 +17,16 @@ const socketController = (io) => {
             // Validate user authentication
             if (!socket.user) {
                 console.log('Unauthorized user attempted to send a message');
+                return;
+            }
+
+            // Rate limit check
+            const userId = socket.user.username; // Unique user identifier
+            if (!rateLimiter(userId, 5, 60000)) { // 10 messages per minute
+                console.log(`Rate limit exceeded for ${userId}`);
+                socket.emit('rate-limit', {
+                    error: 'Rate limit exceeded. Please wait before sending more messages.',
+                });
                 return;
             }
 
@@ -38,6 +49,7 @@ const socketController = (io) => {
                 });
             } catch (error) {
                 console.error('Error saving message:', error);
+                socket.emit('error', { error: 'Failed to send message. Try again later.' });
             }
         });
 
