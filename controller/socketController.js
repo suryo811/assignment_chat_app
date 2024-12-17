@@ -1,5 +1,6 @@
 import authenticateSocket from '../middleware/socketAuthMiddleware.js';
 import Message from '../models/messageModel.js';
+import applyRateLimit from '../utils/redisRateLimit.js'
 
 const socketController = (io) => {
     // Apply authentication middleware
