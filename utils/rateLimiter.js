@@ -4,7 +4,6 @@ const rateLimiters = {}; // To store per-user rate limits
 const rateLimiter = (userId, limit = 10, windowMs = 60000) => {
     const currentTime = Date.now();
 
-    // Initialize user data if not exists
     if (!rateLimiters[userId]) {
         rateLimiters[userId] = { count: 0, startTime: currentTime };
     }
@@ -16,7 +15,6 @@ const rateLimiter = (userId, limit = 10, windowMs = 60000) => {
         userLimiter.count = 0;
         userLimiter.startTime = currentTime;
     }
-
     // Increment count and check limit
     userLimiter.count += 1;
     if (userLimiter.count > limit) {
