@@ -22,7 +22,7 @@ const socketController = (io) => {
 
             // Rate limit check
             const userId = socket.user.username; // Unique user identifier
-            if (!rateLimiter(userId, 10, 60000)) { // 10 messages per minute
+            if (!rateLimiter(userId, 5, 60000)) { // 5 messages per minute
                 console.log(`Rate limit exceeded for ${userId}`);
                 socket.emit('rate-limit', {
                     error: 'Rate limit exceeded. Please wait before sending more messages.',
